@@ -1,0 +1,2 @@
+index_file=E:\Jaen\UJAEN\Sistemas de recuperacion de informacion\Project 2.0\output\index\
+original_files=E:\Jaen\UJAEN\Sistemas de recuperacion de informacion\Project 2.0\coleccionESuja2019

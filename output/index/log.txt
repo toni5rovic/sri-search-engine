@@ -1,0 +1,13 @@
+-------------------------------
+           LOG INFO            
+-------------------------------
+Time needed for generating the data structure:
+	10.316718600000002
+Memory used:
+	36955109 B
+	35.24313831329346 MB
+
+Platform information:
+	Platform: Windows-10-10.0.18362-SP0
+	Processor: Intel64 Family 6 Model 61 Stepping 4, GenuineIntel
+	RAM: 8 GB
