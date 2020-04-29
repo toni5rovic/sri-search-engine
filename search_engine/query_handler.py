@@ -31,8 +31,46 @@ class QueryHandler:
     def sort_dictionary(self, dictionary):
         sorted_dict = sorted(dictionary.items(), key=lambda item: item[1], reverse=True)
         return sorted_dict
-    
-    def process_query(self, query, max_number_of_docs):
+
+    def process_query(self, query, max_number_of_docs, PRF = True):
+        if PRF == False:
+            return self.process_query_default(query, max_number_of_docs)
+        
+        return self.process_query_with_PRF(query, max_number_of_docs)
+
+    def process_query_with_PRF(self, query, max_number_of_docs):
+        N_files = 5
+        N_terms = 5
+
+        similarities_first_run = self.process_query_default(query, max_number_of_docs)
+        sorted_first_run = self.sort_dictionary(similarities_first_run)
+        similarities_first_run = dict(sorted_first_run[:N_files])
+
+        new_query = query
+        for file_id, _ in similarities_first_run.items():
+            top_words = self.get_top_words(file_id, N_terms)
+            for word, _ in top_words.items():
+                new_query += " " + word
+        print(new_query)
+        
+        self.similarities = {}
+        self.similarities_to_show = {}
+        similarities_second_run = self.process_query_default(new_query, max_number_of_docs)
+        return similarities_second_run
+
+    def get_top_words(self, file_id, num_of_top_words):
+        all_words = {}
+        for word_id, index_info in self.index.dictionary.items():
+            word_file_pair = index_info.dictionary.get(file_id)
+            if word_file_pair != None:
+                # in word_dictionary pairs are word:id
+                word = next(key for key, value in self.word_dictionary.dict.items() if value == word_id)
+                all_words[word] = word_file_pair.frequency
+        
+        sorted_words = self.sort_dictionary(all_words)
+        return dict(sorted_words[:num_of_top_words])
+
+    def process_query_default(self, query, max_number_of_docs):
         tokens = self.preprocessor.preprocess_text(query)
         
         self.fill_dictionary(tokens)
@@ -43,10 +81,10 @@ class QueryHandler:
         
         self.find_similarities()
         
-        self.similarities_to_show = self.sort_dictionary(self.similarities)
-        self.similarities_to_show = dict(self.similarities_to_show[:max_number_of_docs])
+        self.sorted_similarities = self.sort_dictionary(self.similarities)
+        self.similarities_to_show = dict(self.sorted_similarities[:max_number_of_docs])
 
-        return self.similarities_to_show
+        return dict(self.sorted_similarities)
         
     def fill_dictionary(self, tokens):
         for token in tokens:
