@@ -17,8 +17,22 @@ from search_engine.index import Index
 from search_engine.exporter import Exporter
 from search_engine.query_handler import QueryHandler
 
-def handle_query(query, num_of_docs = 10):
-    root_path = r"E:\Jaen\UJAEN\Sistemas de recuperacion de informacion\Project 2.0"
+root_path = r"E:\Jaen\UJAEN\Sistemas de recuperacion de informacion\Project 2.0"
+
+def get_file(file_name):
+    config_file = os.path.join(root_path, "config_file.txt")
+    with open(os.path.join(config_file), 'r') as file:
+        strings = file.readlines()
+    strings = list(map(lambda x: x.replace('\n', ''), strings))
+    equal_sign_index = strings[1].find('=')
+    # folder where original files are located
+    original_files = strings[1][(equal_sign_index+1):]
+
+    with open(os.path.join(original_files, file_name), 'r', encoding='utf-8') as file:
+        content = file.read()
+    return content
+
+def handle_query(query, prf=False, num_of_docs = 10):
     config_file = os.path.join(root_path, "config_file.txt")
     max_number_of_docs = num_of_docs  
 
@@ -89,21 +103,34 @@ def handle_query(query, num_of_docs = 10):
 
     # Processing the query
     query_handler = QueryHandler(root_path, index, word_dict, file_dict)
-    results = query_handler.process_query(query, max_number_of_docs)
+    results = query_handler.process_query(query, max_number_of_docs, prf)
     results = results_with_file_names(file_dict, results)
     return results
 
 def results_with_file_names(file_dict, results):
-	final_results = {}
-	for file_id, _ in results.items():
-		file_path = file_dict.get_file_path(file_id)
-		file_name = os.path.basename(file_path)
-		file_name = file_name.replace(".txt", ".html")
-		final_results[file_id] = file_name
+    final_results = []
+    for file_id, sim in results.items():
+        file_path = file_dict.get_file_path(file_id)
+        file_name = os.path.basename(file_path)
+        file_name = file_name.replace(".txt", ".html")
 
-	return final_results
+        fileRes = FileResult()
+        fileRes.fileID = file_id
+        fileRes.fileName = file_name
+        fileRes.similarity = sim
+        fileRes.filePath = fileRes.fileName
+        final_results.append(fileRes)
+
+    return final_results
 
 def error(message):
 	error_dict = {}
 	error_dict["error"] = message
 	return error_dict
+
+class FileResult:
+    def __init__(self):
+        self.fileID = ""
+        self.fileName = ""
+        self.similarity = 0.0
+        self.filePath = ""
