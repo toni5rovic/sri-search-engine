@@ -33,14 +33,24 @@ class QueryHandler:
         return sorted_dict
 
     def process_query(self, query, max_number_of_docs, PRF = True):
+        '''
+        This method processes one query. If the PRF parameter is True, then the 
+        pseudo relevance feedback improvement is used as well. If not, the default 
+        query handling is done.
+        '''
         if PRF == False:
             return self.process_query_default(query, max_number_of_docs)
         
         return self.process_query_with_PRF(query, max_number_of_docs)
 
-    def process_query_with_PRF(self, query, max_number_of_docs):
-        N_files = 5
-        N_terms = 5
+    def process_query_with_PRF(self, query, max_number_of_docs, N_files=5, N_terms=5):
+        '''
+        This method processes the query using the Pseudo Relevance Feedback approach. 
+        First, the query is handled in the default way. From the results, the top "N_files" are 
+        picked, and "N_terms" number of the most frequent words is extracted from each. 
+        Now new query is assembled of the original query and the most frequent words from the top
+        files from the initial results. Search is being run again and the results are returned. 
+        '''
 
         similarities_first_run = self.process_query_default(query, max_number_of_docs)
         sorted_first_run = self.sort_dictionary(similarities_first_run)
@@ -59,6 +69,7 @@ class QueryHandler:
         return similarities_second_run
 
     def get_top_words(self, file_id, num_of_top_words):
+        'This method returns the dictionary of the most frequent words for the given file'
         all_words = {}
         for word_id, index_info in self.index.dictionary.items():
             word_file_pair = index_info.dictionary.get(file_id)
@@ -71,6 +82,8 @@ class QueryHandler:
         return dict(sorted_words[:num_of_top_words])
 
     def process_query_default(self, query, max_number_of_docs):
+        '''This method does the default processing of the query. First it preprocesses the words
+        and the calculations are made.'''
         tokens = self.preprocessor.preprocess_text(query)
         
         self.fill_dictionary(tokens)

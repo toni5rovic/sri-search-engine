@@ -108,6 +108,7 @@ def handle_query(query, prf=False, num_of_docs = 10):
     return results
 
 def results_with_file_names(file_dict, results):
+    'This method creates objects that will be serialized into JSON format.'
     final_results = []
     for file_id, sim in results.items():
         file_path = file_dict.get_file_path(file_id)

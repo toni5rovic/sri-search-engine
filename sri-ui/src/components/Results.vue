@@ -54,7 +54,7 @@ export default {
   name: "Results",
   methods: {
     getFile(fileName) {
-      return 'http://localhost:5000/file/' + fileName
+      return 'http://localhost:5000/api/file/' + fileName
     }
   },
 

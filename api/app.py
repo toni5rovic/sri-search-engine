@@ -24,7 +24,7 @@ def search():
     results = services.handle_query(q, prfBool)
     return json.dumps([ob.__dict__ for ob in results])
 
-@app.route('/file/<string:file_name>', methods=['GET'])
+@app.route('/api/file/<string:file_name>', methods=['GET'])
 @cross_origin()
 def file(file_name):
     result = services.get_file(file_name)

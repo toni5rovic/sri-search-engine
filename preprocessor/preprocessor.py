@@ -51,12 +51,19 @@ class Preprocessor:
             os.makedirs(self.p3_path)
     
     def preprocess_text(self, text):
+        '''
+        This method does the preprocessing of the given text and returns
+        the list of the processed tokens.
+        '''
         token_list = self.normalizer_tokenizer.process_text(text)
         tokens_without_stopwords = self.stopper.remove_stopwords(token_list)
         tokens_stems_only = self.stemmer.get_stems(tokens_without_stopwords)
         return tokens_stems_only
         
     def preprocess(self, generate_metadata=False, generate_output_files=False):
+        '''
+        This method does all the preprocessing of all the files in the system
+        '''
         self.prepare_output_folders()
     
         start_time = timer()
